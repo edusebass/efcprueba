@@ -37,6 +37,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.log(response)
       setAuth(userData);
       localStorage.setItem('token', userData.token); // Guardar token en localStorage
+      document.cookie = `token=${userData.token}; expires=${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()}; path=/`;
+
       router.push("/modulos/modulo1");
       
 
@@ -52,7 +54,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = () => {
     setAuth(null);
     localStorage.removeItem('token'); // Remover token del localStorage al cerrar sesión
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   };
+
+
   const fetchUserProfile = async (storedToken:any) => {
     try {
       const response = await axios.get('http://localhost:3000/api/perfil', {
