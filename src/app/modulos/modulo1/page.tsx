@@ -1,12 +1,8 @@
 "use client"
-import React, { useEffect } from 'react'
-import { useAuth } from '@/context/AuthContext'
-import { DatePicker, Form, message } from 'antd';
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
-// import "antd/dist/antd.css";
-// import "./App.css";
-import { Button, Table, Modal, Input } from "antd";
-import { useState } from "react";
+import { useAuth } from '@/context/AuthContext'
+import { DatePicker, Form, message, Button, Table, Modal, Input } from 'antd';
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 
@@ -21,8 +17,6 @@ export default function page() {
   const [isEditing, setIsEditing] = useState(false); //variable para modal editar
   const [editingStudent, setEditingStudent] = useState(null); //variable para saber si se esta editando
   const [dataSource, setDataSource] = useState([]); //aqui se guardar los datos obtenidos de la api
-  const [editingStudentData, setEditingStudentData] = useState(null); //nuevo estado para almacenar los datos del estudiante que se está editando.
-
   const [form] = Form.useForm();
 
   
@@ -176,10 +170,6 @@ export default function page() {
       message.error(error.message || 'Error al procesar la solicitud');
     }
   };
-  
-
-
-
 
   //funcion para poder eliminar un estudiante
   const onDeleteStudent = async (_id:any) => {
@@ -198,7 +188,7 @@ export default function page() {
       }
   
       // Eliminar el estudiante de la lista localmente
-      setDataSource((prevData) => prevData.filter((student) => student._id));
+      setDataSource((prevData) => prevData.filter((student:any) => student._id));
       console.log(dataSource)
       message.success('Estudiante eliminado exitosamente');
 
@@ -234,12 +224,6 @@ export default function page() {
   setIsEditing(true);
   setEditingStudent(record);
   form.setFieldsValue(record); // Llenar el formulario con los datos del estudiante
-  };
-
-
-  const resetEditing = () => {
-    setIsEditing(false);
-    setEditingStudent(null);
   };
 
   return (
