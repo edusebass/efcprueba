@@ -1,4 +1,5 @@
 import SideBar from "@/components/SideBar"
+import { AuthProvider } from "@/context/AuthContext"
 
 export const metadata = {
   title: 'Next.js',
@@ -11,6 +12,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
+    <AuthProvider>
+
       <SideBar children={children} />
+    </AuthProvider>
+
   )
 }

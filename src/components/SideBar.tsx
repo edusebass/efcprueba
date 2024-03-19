@@ -10,10 +10,13 @@ import {
   VideoCameraOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+
 
 
 const SideBar = ({children} : {children: ReactNode}) => {
   
+  const { logout } = useAuth(); // Usa el hook useAuth para obtener la función de inicio de sesión del contexto de autenticación
 
   return (
     <Layout className=''>
@@ -27,7 +30,7 @@ const SideBar = ({children} : {children: ReactNode}) => {
       >
         <div className="flex justify-between w-full items-center">
           <h1 className='text-white'>Nombre de la empresa</h1>
-          <Button className='bg-blue-500' href='/'> Salir </Button>
+          <Button className='bg-blue-500' href='/' onClick={logout}> Salir </Button>
         </div>
       </Header>
       <Content className='flex'>

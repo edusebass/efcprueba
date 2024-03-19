@@ -1,14 +1,26 @@
 "use client"
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LoginForm() {
     const router = useRouter();
+    const { login } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleLogin = (event:any) => {
-        event.preventDefault(); // Previene el envío del formulario
-        console.log(event)        // Redirecciona al usuario a la ruta "/modulos/modulo1" después de iniciar sesión
-        router.replace("/modulos/modulo1");
+    const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const formData = new FormData(event.currentTarget);
+        const email = formData.get('email') as string;
+        const password = formData.get('password') as string;
+
+        try {
+            await login(email, password);
+        } catch (error:any) {
+            console.log(error)
+        }
     };
 
     return (
@@ -29,8 +41,9 @@ export default function LoginForm() {
                                 <input type="password" name="password" id="password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
                             </div>
 
-                            <button type="submit" className="w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Iniciar sesión</button>
+                            <button type="submit" className={`w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ${loading ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={loading}>Ingresar</button>
 
+                            {error && <p className="text-red-500">{error}</p>}
                         </form>
                     </div>
                 </div>
