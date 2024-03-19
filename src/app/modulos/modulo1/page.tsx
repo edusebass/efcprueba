@@ -18,7 +18,7 @@ export default function page() {
   const router = useRouter();
 
   //variables crud 
-  const [isEditing, setIsEditing] = useState(false); //variable para modal
+  const [isEditing, setIsEditing] = useState(false); //variable para modal editar
   const [editingStudent, setEditingStudent] = useState(null); //variable para saber si se esta editando
   const [dataSource, setDataSource] = useState([]); //aqui se guardar los datos obtenidos de la api
   const [editingStudentData, setEditingStudentData] = useState(null); //nuevo estado para almacenar los datos del estudiante que se está editando.
@@ -81,7 +81,7 @@ export default function page() {
           <>
             <EditOutlined
               onClick={() => {
-                onEditStudent(record._id);
+                onEditStudent(record);
               }}
             />
             <DeleteOutlined
@@ -132,18 +132,24 @@ export default function page() {
     }
   };
 
+  
+  //funcion para actualizar y registrar
   const onSaveStudent = async () => {
     try {
       const token = localStorage.getItem('token');
       form.validateFields().then(async (values) => {
-        // Convertir la fecha de nacimiento a formato AAAA/MM/DD
         const fechaNacimiento = values.fecha_nacimiento.toISOString().split('T')[0];
-  
-        // Asignar la fecha formateada de vuelta a los values
         values.fecha_nacimiento = fechaNacimiento;
   
-        const response = await fetch('http://localhost:3000/api/estudiante/registro', {
-          method: 'POST',
+        let url = 'http://localhost:3000/api/estudiante/registro';
+        let method = 'POST';
+        if (editingStudent) {
+          url = `http://localhost:3000/api/estudiante/actualizar/${editingStudent._id}`;
+          method = 'PUT';
+        }
+  
+        const response = await fetch(url, {
+          method,
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
@@ -154,26 +160,26 @@ export default function page() {
         if (!response.ok) {
           const errorData = await response.json();
           message.error(errorData.msg)
-          // throw new Error(errorData.msg || 'Error al registrar el estudiante');
-          return null
-          
+          return null;
         }
-        
   
-        message.success('Estudiante registrado exitosamente');
+        message.success(editingStudent ? 'Estudiante actualizado exitosamente' : 'Estudiante registrado exitosamente');
         setIsEditing(false);
-        form.resetFields(); 
-
-        // Obtener la lista actualizada de estudiantes después de agregar uno nuevo
+        form.resetFields();
+  
         fetchStudents(token).then((formattedData) => {
           setDataSource(formattedData);
         });
       });
     } catch (error:any) {
-      console.error('Error:', error.message);
-      message.error(error.message);
+      console.log('Error:', error.message);
+      message.error(error.message || 'Error al procesar la solicitud');
     }
   };
+  
+
+
+
 
   //funcion para poder eliminar un estudiante
   const onDeleteStudent = async (_id:any) => {
@@ -223,10 +229,13 @@ export default function page() {
     }
   }, [auth]); // Ejecutar efecto solo cuando 'auth' cambia
   
-  const onEditStudent = (_id:any) => {
-    setIsEditing(true);
-    setEditingStudent({ ..._id });
+  // Función para abrir el modal de edición y establecer los datos del estudiante en edición
+  const onEditStudent = (record:any) => {
+  setIsEditing(true);
+  setEditingStudent(record);
+  form.setFieldsValue(record); // Llenar el formulario con los datos del estudiante
   };
+
 
   const resetEditing = () => {
     setIsEditing(false);
@@ -241,19 +250,21 @@ export default function page() {
         <Table columns={columns} dataSource={dataSource}></Table>
         {/* Modal para agregar estudiante */}
         <Modal
-          title="Agregar Estudiante"
+          title={editingStudent ? "Editar Estudiante" : "Agregar Estudiante"}
           visible={isEditing}
           onCancel={() => {
-            resetEditing();
+            setIsEditing(false);
+            form.resetFields();
           }}
           footer={[
             <Button key="cancel" onClick={() => {
-              resetEditing();
+              setIsEditing(false);
+              form.resetFields();
             }}>
               Cancelar
             </Button>,
             <Button key="save" type="primary" onClick={onSaveStudent}>
-              Guardar
+              {editingStudent ? 'Actualizar' : 'Guardar'}
             </Button>,
           ]}
         >
@@ -317,53 +328,6 @@ export default function page() {
             </Form.Item>
           </Form>
         </Modal>
-
-        {/* Modal para editar */}
-        {/* <Modal
-          title="Edit Student"
-          visible={isEditing}
-          okText="Save"
-          onCancel={() => {
-            resetEditing();
-          }}
-          onOk={() => {
-            setDataSource((pre) => {
-              return pre.map((student) => {
-                if (student.id === editingStudent.id) {
-                  return editingStudent;
-                } else {
-                  return student;
-                }
-              });
-            });
-            resetEditing();
-          }}
-        >
-          <Input
-            value={editingStudent?.name}
-            onChange={(e) => {
-              setEditingStudent((pre) => {
-                return { ...pre, name: e.target.value };
-              });
-            }}
-          />
-          <Input
-            value={editingStudent?.email}
-            onChange={(e) => {
-              setEditingStudent((pre) => {
-                return { ...pre, email: e.target.value };
-              });
-            }}
-          />
-          <Input
-            value={editingStudent?.address}
-            onChange={(e) => {
-              setEditingStudent((pre) => {
-                return { ...pre, address: e.target.value };
-              });
-            }}
-          />
-        </Modal> */}
       </header>
     </div>
     </>
