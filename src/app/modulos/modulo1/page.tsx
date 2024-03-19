@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
-import { Form, message } from 'antd';
+import { DatePicker, Form, message } from 'antd';
 import { useRouter } from 'next/navigation';
 // import "antd/dist/antd.css";
 // import "./App.css";
@@ -21,6 +21,8 @@ export default function page() {
   const [isEditing, setIsEditing] = useState(false); //variable para modal
   const [editingStudent, setEditingStudent] = useState(null); //variable para saber si se esta editando
   const [dataSource, setDataSource] = useState([]); //aqui se guardar los datos obtenidos de la api
+  const [editingStudentData, setEditingStudentData] = useState(null); //nuevo estado para almacenar los datos del estudiante que se está editando.
+
   const [form] = Form.useForm();
 
   
@@ -74,17 +76,18 @@ export default function page() {
     {
       key: "10",
       title: "Acciones",
-      render: (record) => {
+      render: (record:any) => {
         return (
           <>
             <EditOutlined
               onClick={() => {
-                onEditStudent(record);
+                onEditStudent(record._id);
               }}
             />
             <DeleteOutlined
               onClick={() => {
-                onDeleteStudent(record);
+                onDeleteStudent(record._id);
+                console.log(record.id)
               }}
               style={{ color: "red", marginLeft: 12 }}
             />
@@ -112,6 +115,7 @@ export default function page() {
 
       const formattedData = data.map((estudiante:any, index:any) => ({
         id: index + 1,
+        _id: estudiante._id,
         nombre: `${estudiante.nombre}`,
         apellido: estudiante.apellido,
         cedula: estudiante.cedula,
@@ -119,7 +123,6 @@ export default function page() {
         ciudad: estudiante.ciudad,
         direccion: estudiante.direccion,
         telefono: estudiante.telefono,
-        
         email: estudiante.email,
       }));
       return formattedData
@@ -130,15 +133,19 @@ export default function page() {
   };
 
   const onSaveStudent = async () => {
-    
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('token');
       form.validateFields().then(async (values) => {
+        // Convertir la fecha de nacimiento a formato AAAA/MM/DD
+        const fechaNacimiento = values.fecha_nacimiento.toISOString().split('T')[0];
+  
+        // Asignar la fecha formateada de vuelta a los values
+        values.fecha_nacimiento = fechaNacimiento;
+  
         const response = await fetch('http://localhost:3000/api/estudiante/registro', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            // Añade el token de autorización si es necesario
             'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify(values),
@@ -146,14 +153,21 @@ export default function page() {
   
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.msg || 'Error al registrar el estudiante');
+          message.error(errorData.msg)
+          // throw new Error(errorData.msg || 'Error al registrar el estudiante');
+          return null
+          
         }
+        
   
-        const responseData = await response.json();
-        console.log(responseData.msg); // Mensaje de éxito del backend
         message.success('Estudiante registrado exitosamente');
         setIsEditing(false);
-        form.resetFields(); // Limpiar el formulario después de agregar el estudiante
+        form.resetFields(); 
+
+        // Obtener la lista actualizada de estudiantes después de agregar uno nuevo
+        fetchStudents(token).then((formattedData) => {
+          setDataSource(formattedData);
+        });
       });
     } catch (error:any) {
       console.error('Error:', error.message);
@@ -161,11 +175,43 @@ export default function page() {
     }
   };
 
+  //funcion para poder eliminar un estudiante
+  const onDeleteStudent = async (_id:any) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3000/api/estudiante/eliminar/${_id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.msg || 'Error al eliminar el estudiante');
+      }
+  
+      // Eliminar el estudiante de la lista localmente
+      setDataSource((prevData) => prevData.filter((student) => student._id));
+      console.log(dataSource)
+      message.success('Estudiante eliminado exitosamente');
 
+      // Obtener la lista actualizada de estudiantes después de agregar uno nuevo
+      fetchStudents(token).then((formattedData) => {
+        setDataSource(formattedData);
+      });
+      
+    } catch (error:any) {
+      console.log('Error:', error.message);
+      message.error(error.message);
+    }
+  };
 
-  useEffect(() => {
-     // Reemplaza "tu_token_aqui" con el token real
-     const token = localStorage.getItem('token')
+  //useeffect para poder enviar el mesnaje de bienvenida y obtener el token cuando
+  // se despliega la tabla
+    useEffect(() => {
+      // Reemplaza "tu_token_aqui" con el token real
+      const token = localStorage.getItem('token')
     console.log(token)
     fetchStudents(token).then((formattedData) => {
       setDataSource(formattedData);
@@ -176,36 +222,17 @@ export default function page() {
       message.info(`Bienvenido: ${auth.nombre} ${auth.apellido}`);
     }
   }, [auth]); // Ejecutar efecto solo cuando 'auth' cambia
-
-
-
-
-
-  // const onDeleteStudent = (record) => {
-  //   Modal.confirm({
-  //     title: "Are you sure, you want to delete this student record?",
-  //     okText: "Yes",
-  //     okType: "danger",
-  //     onOk: () => {
-  //       setDataSource((pre) => {
-  //         return pre.filter((student) => student.id !== record.id);
-  //       });
-  //     },
-  //   });
-  // };
-  // const onEditStudent = (record) => {
-  //   setIsEditing(true);
-  //   setEditingStudent({ ...record });
-  // };
+  
+  const onEditStudent = (_id:any) => {
+    setIsEditing(true);
+    setEditingStudent({ ..._id });
+  };
 
   const resetEditing = () => {
     setIsEditing(false);
     setEditingStudent(null);
   };
 
-
-
-  
   return (
     <>
       <div className="App">
@@ -232,9 +259,49 @@ export default function page() {
         >
           <Form form={form} layout="vertical">
             <Form.Item
-              name="name"
+              name="nombre"
               label="Nombre"
               rules={[{ required: true, message: 'Por favor ingrese el nombre del estudiante' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="apellido"
+              label="Apellido"
+              rules={[{ required: true, message: 'Por favor ingrese el apellido del estudiante' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="cedula"
+              label="Cédula"
+              rules={[{ required: true, message: 'Por favor ingrese la cédula del estudiante' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="fecha_nacimiento"
+              label="Fecha de nacimiento"
+              rules={[{ required: true, message: 'Por favor ingrese la fecha de nacimiento del estudiante' }]}
+            >
+              <DatePicker format="YYYY/MM/DD" />
+            </Form.Item>
+            <Form.Item
+              name="ciudad"
+              label="Ciudad"
+              rules={[{ required: true, message: 'Por favor ingrese la ciudad del estudiante' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="direccion"
+              label="Dirección"
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="telefono"
+              label="Teléfono"
             >
               <Input />
             </Form.Item>
@@ -246,9 +313,6 @@ export default function page() {
                 { type: 'email', message: 'Por favor ingrese un correo electrónico válido' },
               ]}
             >
-              <Input />
-            </Form.Item>
-            <Form.Item name="address" label="Dirección">
               <Input />
             </Form.Item>
           </Form>
