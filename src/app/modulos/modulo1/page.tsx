@@ -6,16 +6,15 @@ import { DatePicker, Form, message, Button, Table, Modal, Input } from 'antd';
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 
-export default function page() {
+export default function Page() {
 
   // variables auth
   const { auth } = useAuth();
   console.log(auth)
-  const router = useRouter();
 
   //variables crud 
   const [isEditing, setIsEditing] = useState(false); //variable para modal editar
-  const [editingModule, setEditingModule] = useState(null); //variable para saber si se esta editando
+  const [editingModule, setEditingModule] = useState<any>(null); //variable para saber si se esta editando
   const [dataSource, setDataSource] = useState([]); //aqui se guardar los datos obtenidos de la api
   const [form] = Form.useForm();
 

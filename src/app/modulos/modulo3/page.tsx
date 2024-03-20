@@ -54,8 +54,24 @@ const MatriculaForm = () => {
 		},
 	];
 
-	const [dataSource, setDataSource] = useState([]); //aqui se guardar los datos obtenidos de la api
-	const [dataSource2, setDataSource2] = useState([]); //aqui se guardar los datos obtenidos de la api
+	interface Estudiante {
+		id: number;
+		_id: string;
+		nombre: string;
+		apellido: string;
+	}
+	
+	interface Materia {
+		id: number;
+		_id: string;
+		nombre: string;
+		codigo: string;
+		descripcion: string;
+		creditos: number;
+	}
+
+	const [dataSource, setDataSource] = useState<Estudiante[]>([]); //aqui se guardar los datos obtenidos de la api
+	const [dataSource2, setDataSource2] = useState<Materia[]>([]); //aqui se guardar los datos obtenidos de la api
 	const [dataSource3, setDataSource3] = useState([]); //aqui se guardar los datos obtenidos de la api
 	console.log(dataSource)
 	console.log(dataSource2)
@@ -176,7 +192,7 @@ const MatriculaForm = () => {
 	const { Option } = Select;
 	const [form] = Form.useForm();
 	const [isEditing, setIsEditing] = useState(false); //variable para modal editar
-  	const [editingModule, setEditingModule] = useState(null); //variable para saber si se esta editando
+  	const [editingModule, setEditingModule] = useState<any>(null); //variable para saber si se esta editando
 	const [loading, setLoading] = useState(false);
 
 	const onSave = async () => {
