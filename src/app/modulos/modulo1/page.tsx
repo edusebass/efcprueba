@@ -15,7 +15,7 @@ export default function page() {
 
   //variables crud 
   const [isEditing, setIsEditing] = useState(false); //variable para modal editar
-  const [editingStudent, setEditingStudent] = useState(null); //variable para saber si se esta editando
+  const [editingModule, setEditingModule] = useState(null); //variable para saber si se esta editando
   const [dataSource, setDataSource] = useState([]); //aqui se guardar los datos obtenidos de la api
   const [form] = Form.useForm();
 
@@ -75,12 +75,12 @@ export default function page() {
           <>
             <EditOutlined
               onClick={() => {
-                onEditStudent(record);
+                onEdit(record);
               }}
             />
             <DeleteOutlined
               onClick={() => {
-                onDeleteStudent(record._id);
+                onDelete(record._id);
                 console.log(record.id)
               }}
               style={{ color: "red", marginLeft: 12 }}
@@ -91,8 +91,8 @@ export default function page() {
     },
   ];
 
-  // listar estudiantes
-  const fetchStudents = async (token:any) => {
+  // listar
+  const fetchModule = async (token:any) => {
     try {
       const response = await fetch("http://localhost:3000/api/estudiantes", {
         method: "GET",
@@ -113,7 +113,7 @@ export default function page() {
         nombre: `${estudiante.nombre}`,
         apellido: estudiante.apellido,
         cedula: estudiante.cedula,
-        fechaNacimiento: estudiante.fecha_nacimiento,
+        fechaNacimiento: new Date(estudiante.fecha_nacimiento).toISOString().split('T')[0],
         ciudad: estudiante.ciudad,
         direccion: estudiante.direccion,
         telefono: estudiante.telefono,
@@ -128,17 +128,18 @@ export default function page() {
 
   
   //funcion para actualizar y registrar
-  const onSaveStudent = async () => {
+  const onSave = async () => {
     try {
       const token = localStorage.getItem('token');
       form.validateFields().then(async (values) => {
+        // solo cuando utilze fechas
         const fechaNacimiento = values.fecha_nacimiento.toISOString().split('T')[0];
         values.fecha_nacimiento = fechaNacimiento;
   
         let url = 'http://localhost:3000/api/estudiante/registro';
         let method = 'POST';
-        if (editingStudent) {
-          url = `http://localhost:3000/api/estudiante/actualizar/${editingStudent._id}`;
+        if (editingModule) {
+          url = `http://localhost:3000/api/estudiante/actualizar/${editingModule._id}`;
           method = 'PUT';
         }
   
@@ -157,11 +158,11 @@ export default function page() {
           return null;
         }
   
-        message.success(editingStudent ? 'Estudiante actualizado exitosamente' : 'Estudiante registrado exitosamente');
+        message.success(editingModule ? 'Estudiante actualizado exitosamente' : 'Estudiante registrado exitosamente');
         setIsEditing(false);
         form.resetFields();
   
-        fetchStudents(token).then((formattedData) => {
+        fetchModule(token).then((formattedData) => {
           setDataSource(formattedData);
         });
       });
@@ -172,7 +173,7 @@ export default function page() {
   };
 
   //funcion para poder eliminar un estudiante
-  const onDeleteStudent = async (_id:any) => {
+  const onDelete = async (_id:any) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3000/api/estudiante/eliminar/${_id}`, {
@@ -193,7 +194,7 @@ export default function page() {
       message.success('Estudiante eliminado exitosamente');
 
       // Obtener la lista actualizada de estudiantes después de agregar uno nuevo
-      fetchStudents(token).then((formattedData) => {
+      fetchModule(token).then((formattedData) => {
         setDataSource(formattedData);
       });
       
@@ -209,7 +210,7 @@ export default function page() {
       // Reemplaza "tu_token_aqui" con el token real
       const token = localStorage.getItem('token')
     console.log(token)
-    fetchStudents(token).then((formattedData) => {
+    fetchModule(token).then((formattedData) => {
       setDataSource(formattedData);
     });
   }, []);
@@ -220,9 +221,9 @@ export default function page() {
   }, [auth]); // Ejecutar efecto solo cuando 'auth' cambia
   
   // Función para abrir el modal de edición y establecer los datos del estudiante en edición
-  const onEditStudent = (record:any) => {
+  const onEdit = (record:any) => {
   setIsEditing(true);
-  setEditingStudent(record);
+  setEditingModule(record);
   form.setFieldsValue(record); // Llenar el formulario con los datos del estudiante
   };
 
@@ -234,7 +235,7 @@ export default function page() {
         <Table columns={columns} dataSource={dataSource}></Table>
         {/* Modal para agregar estudiante */}
         <Modal
-          title={editingStudent ? "Editar Estudiante" : "Agregar Estudiante"}
+          title={editingModule ? "Editar Estudiante" : "Agregar Estudiante"}
           visible={isEditing}
           onCancel={() => {
             setIsEditing(false);
@@ -247,8 +248,8 @@ export default function page() {
             }}>
               Cancelar
             </Button>,
-            <Button key="save" type="primary" onClick={onSaveStudent}>
-              {editingStudent ? 'Actualizar' : 'Guardar'}
+            <Button key="save" type="primary" onClick={onSave}>
+              {editingModule ? 'Actualizar' : 'Guardar'}
             </Button>,
           ]}
         >
