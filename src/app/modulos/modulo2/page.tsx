@@ -222,7 +222,7 @@ export default function page() {
             }}>
               Cancelar
             </Button>,
-            <Button key="save" type="primary" onClick={onSave}>
+            <Button key="save" type="primary" onClick={onSave} className='bg-blue-700'>
               {editingModule ? 'Actualizar' : 'Guardar'}
             </Button>,
           ]}

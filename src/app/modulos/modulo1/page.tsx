@@ -222,9 +222,9 @@ export default function page() {
   
   // Función para abrir el modal de edición y establecer los datos del estudiante en edición
   const onEdit = (record:any) => {
-  setIsEditing(true);
-  setEditingModule(record);
-  form.setFieldsValue(record); // Llenar el formulario con los datos del estudiante
+    setIsEditing(true);
+    setEditingModule(record);
+    form.setFieldsValue(record); // Llenar el formulario con los datos del estudiante
   };
 
   return (
@@ -248,7 +248,7 @@ export default function page() {
             }}>
               Cancelar
             </Button>,
-            <Button key="save" type="primary" onClick={onSave}>
+            <Button key="save" type="primary" onClick={onSave} className='bg-blue-700'>
               {editingModule ? 'Actualizar' : 'Guardar'}
             </Button>,
           ]}
