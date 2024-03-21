@@ -79,7 +79,7 @@ const MatriculaForm = () => {
 
 	const fetchModule = async (token:any) => {
 		try {
-		const response = await fetch("http://localhost:3000/api/estudiantes", {
+		const response = await fetch(`${process.env.NEXT_PUBLIC_URL_BACKEND}/api/estudiantes`, {
 			method: "GET",
 			headers: {
 			"Authorization": `Bearer ${token}`,
@@ -113,7 +113,7 @@ const MatriculaForm = () => {
 
 	const fetchModules = async (token:any) => {
 		try {
-			const response = await fetch("http://localhost:3000/api/materias", {
+			const response = await fetch(`${process.env.NEXT_PUBLIC_URL_BACKEND}/api/materias`, {
 			method: "GET",
 			headers: {
 				"Authorization": `Bearer ${token}`,
@@ -141,11 +141,10 @@ const MatriculaForm = () => {
 			return [];
 		}
 	};
-
 	//obtiene lo de la tabla
 	const fetchModules3 = async (token:any) => {
 		try {
-			const response = await fetch("http://localhost:3000/api/matriculas", {
+			const response = await fetch(process.env.NEXT_PUBLIC_URL_BACKEND + `/api/matriculas`, {
 			method: "GET",
 			headers: {
 				"Authorization": `Bearer ${token}`,
@@ -201,10 +200,10 @@ const MatriculaForm = () => {
 			form.validateFields().then(async (values) => {
 				console.log(values)
 		
-				let url = 'http://localhost:3000/api/matricula/registro';
+				let url = `${process.env.NEXT_PUBLIC_URL_BACKEND}/api/matricula/registro`;
 				let method = 'POST';
 				if (editingModule) {
-					url = `http://localhost:3000/api/matricula/actualizar/${editingModule._id}`;
+					url = `${process.env.NEXT_PUBLIC_URL_BACKEND}/api/matricula/actualizar/${editingModule._id}`;
 					method = 'PUT';
 				}
 			
@@ -246,7 +245,7 @@ const MatriculaForm = () => {
 	const onDelete = async (_id:any) => {
 	try {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`http://localhost:3000/api/matricula/eliminar/${_id}`, {
+		const response = await fetch(`${process.env.NEXT_PUBLIC_URL_BACKEND}/api/matricula/eliminar/${_id}`, {
 			method: 'DELETE',
 			headers: {
 				'Authorization': `Bearer ${token}`,

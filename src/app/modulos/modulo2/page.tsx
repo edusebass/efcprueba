@@ -73,7 +73,7 @@ export default function Page() {
   // listar estudiantes
   const fetchModules = async (token:any) => {
     try {
-      const response = await fetch("http://localhost:3000/api/materias", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_BACKEND}/api/materias`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -110,10 +110,10 @@ export default function Page() {
       form.validateFields().then(async (values) => {
         
   
-        let url = 'http://localhost:3000/api/materia/registro';
+        let url = `${process.env.NEXT_PUBLIC_URL_BACKEND}/api/materia/registro`;
         let method = 'POST';
         if (editingModule) {
-          url = `http://localhost:3000/api/materia/actualizar/${editingModule._id}`;
+          url = `${process.env.NEXT_PUBLIC_URL_BACKEND}/api/materia/actualizar/${editingModule._id}`;
           method = 'PUT';
         }
   
@@ -150,7 +150,7 @@ export default function Page() {
   const onDelete = async (_id:any) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/materia/eliminar/${_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_BACKEND}/api/materia/eliminar/${_id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

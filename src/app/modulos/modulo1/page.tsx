@@ -93,7 +93,7 @@ export default function Page() {
   // listar
   const fetchModule = async (token:any) => {
     try {
-      const response = await fetch("http://localhost:3000/api/estudiantes", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_BACKEND}/api/estudiantes`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -135,10 +135,10 @@ export default function Page() {
         const fechaNacimiento = values.fecha_nacimiento.toISOString().split('T')[0];
         values.fecha_nacimiento = fechaNacimiento;
   
-        let url = 'http://localhost:3000/api/estudiante/registro';
+        let url = `${process.env.NEXT_PUBLIC_URL_BACKEND}/api/estudiante/registro`;
         let method = 'POST';
         if (editingModule) {
-          url = `http://localhost:3000/api/estudiante/actualizar/${editingModule._id}`;
+          url = `${process.env.NEXT_PUBLIC_URL_BACKEND}/api/estudiante/actualizar/${editingModule._id}`;
           method = 'PUT';
         }
   
@@ -175,7 +175,7 @@ export default function Page() {
   const onDelete = async (_id:any) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/estudiante/eliminar/${_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_BACKEND}/api/estudiante/eliminar/${_id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
