@@ -251,7 +251,10 @@ export default function Page() {
             <Form.Item
               name="creditos"
               label="Creditos"
-              rules={[{ required: true, message: 'Por favor ingrese la fecha de nacimiento de la materia' }]}
+              rules={[
+                  { required: true, message: 'Por favor ingrese la fecha de nacimiento de la materia' },
+                  {type:"number", message: "Ingresa solo numeros"}
+                ]}
             >
               <Input />
             </Form.Item>
