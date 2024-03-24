@@ -230,7 +230,7 @@ export default function Page() {
     <>
       <div className="App">
       <header className="App-header">
-        <Button onClick={() => setIsEditing(true)}>Add a new Student</Button>
+        <Button onClick={() => setIsEditing(true)}>Añadir nuevo estudiante</Button>
         <Table columns={columns} dataSource={dataSource}></Table>
         {/* Modal para agregar estudiante */}
         <Modal
@@ -291,12 +291,14 @@ export default function Page() {
             <Form.Item
               name="direccion"
               label="Dirección"
+              rules={[{ required: true, message: 'Por favor ingrese la ciudad del estudiante' }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               name="telefono"
               label="Teléfono"
+              rules={[{ required: true, message: 'Por favor ingrese la ciudad del estudiante' }]}
             >
               <Input />
             </Form.Item>

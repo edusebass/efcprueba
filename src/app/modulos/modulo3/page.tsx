@@ -303,7 +303,10 @@ const MatriculaForm = () => {
 				<Form.Item
 					name="codigo"
 					label="Codigo"
-					rules={[{ required: true, message: 'Por favor ingrese el codigo de la materia' }]}
+					rules={[
+							{ required: true, message: 'Por favor ingrese el codigo de la materia' },
+							{type:"number", message: "Ingresa solo numeros"}
+						]}
 					>
 				<Input />
 				</Form.Item>
