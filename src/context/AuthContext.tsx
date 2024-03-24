@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Login function
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/login', { email, password });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_URL_BACKEND}/api/login`, { email, password });
       const userData = response.data;
       console.log(response)
       setAuth(userData);
@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const fetchUserProfile = async (storedToken:any) => {
     try {
-      const response = await axios.get('http://localhost:3000/api/perfil', {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_URL_BACKEND}/api/perfil`, {
         headers: {
           Authorization: `Bearer ${storedToken}`,
         },
