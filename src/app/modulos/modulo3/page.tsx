@@ -196,6 +196,7 @@ const MatriculaForm = () => {
 
 	const onSave = async () => {
 		try {
+			setLoading(true)
 			const token = localStorage.getItem('token');
 			form.validateFields().then(async (values) => {
 				console.log(values)
@@ -219,12 +220,14 @@ const MatriculaForm = () => {
 				if (!response.ok) {
 					const errorData = await response.json();
 					message.error(errorData.msg)
+					setLoading(false)
 					return null;
 				}
 
 				message.success(editingModule ? 'Estudiante actualizado exitosamente' : 'Estudiante registrado exitosamente');
 				setIsEditing(false);
 				form.resetFields();
+				setLoading(true)
 			
 				fetchModules3(token).then((formattedData) => {
 					setDataSource3(formattedData);
@@ -294,7 +297,9 @@ const MatriculaForm = () => {
 				}}>
 					Cancelar
 				</Button>,
-				<Button key="save" type="primary" onClick={onSave} className='bg-blue-700'>
+				<Button key="save" type="primary" onClick={onSave} className='bg-blue-700'
+					loading={loading}
+				>
 					{editingModule ? 'Actualizar' : 'Guardar'}
 				</Button>,
 				]}
@@ -304,16 +309,19 @@ const MatriculaForm = () => {
 					name="codigo"
 					label="Codigo"
 					rules={[
-							{ required: true, message: 'Por favor ingrese el codigo de la materia' },
-							{type:"number", message: "Ingresa solo numeros"}
-						]}
+						{ required: true, message: 'Ingrese por favor' },
+						{ pattern: /^[0-9]+$/, message: "Ingrese solo números" }
+					  ]}
 					>
 				<Input />
 				</Form.Item>
 				<Form.Item
 					name="descripcion"
 					label="Descripcion"
-					rules={[{ required: true, message: 'Por favor ingrese el codigo de la materia' }]}
+					rules={[
+						{ required: true, message: 'Ingrese por favor' },
+						{ pattern: /^[a-zA-Z]+$/, message: "Ingrese solo letras" }
+					  ]}
 					>
 				<Input />
 				</Form.Item>

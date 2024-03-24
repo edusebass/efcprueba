@@ -127,8 +127,10 @@ export default function Page() {
 
   
   //funcion para actualizar y registrar
+  const [loading, setloading] = useState(false)
   const onSave = async () => {
     try {
+      setloading(true)
       const token = localStorage.getItem('token');
       form.validateFields().then(async (values) => {
         // solo cuando utilze fechas
@@ -154,12 +156,14 @@ export default function Page() {
         if (!response.ok) {
           const errorData = await response.json();
           message.error(errorData.msg)
+          setloading(false)
           return null;
         }
   
         message.success(editingModule ? 'Estudiante actualizado exitosamente' : 'Estudiante registrado exitosamente');
         setIsEditing(false);
         form.resetFields();
+        setloading(false)
   
         fetchModule(token).then((formattedData) => {
           setDataSource(formattedData);
@@ -247,7 +251,9 @@ export default function Page() {
             }}>
               Cancelar
             </Button>,
-            <Button key="save" type="primary" onClick={onSave} className='bg-blue-700'>
+            <Button key="save" type="primary" onClick={onSave} className='bg-blue-700'
+              loading={loading}
+            >
               {editingModule ? 'Actualizar' : 'Guardar'}
             </Button>,
           ]}
@@ -256,21 +262,30 @@ export default function Page() {
             <Form.Item
               name="nombre"
               label="Nombre"
-              rules={[{ required: true, message: 'Por favor ingrese el nombre del estudiante' }]}
+              rules={[
+                { required: true, message: 'Ingrese por favor' },
+                { pattern: /^[a-zA-Z]+$/, message: "Ingrese solo letras" }
+              ]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               name="apellido"
               label="Apellido"
-              rules={[{ required: true, message: 'Por favor ingrese el apellido del estudiante' }]}
+              rules={[{ required: true, message: 'Por favor ingrese el apellido del estudiante' },
+              { pattern: /^[a-zA-Z]+$/, message: "Ingrese solo letras" }
+            ]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               name="cedula"
               label="Cédula"
-              rules={[{ required: true, message: 'Por favor ingrese la cédula del estudiante' }]}
+              rules={[
+                { required: true, message: 'Ingrese por favor' },
+                { pattern: /^[0-9]+$/, message: "Ingrese solo números" },
+                { max: 10, message: "Máximo 10 dígitos" }
+              ]}
             >
               <Input />
             </Form.Item>
@@ -284,7 +299,10 @@ export default function Page() {
             <Form.Item
               name="ciudad"
               label="Ciudad"
-              rules={[{ required: true, message: 'Por favor ingrese la ciudad del estudiante' }]}
+              rules={[
+                { required: true, message: 'Ingrese por favor' },
+                { pattern: /^[a-zA-Z]+$/, message: "Ingrese solo letras" }
+              ]}
             >
               <Input />
             </Form.Item>
@@ -298,7 +316,9 @@ export default function Page() {
             <Form.Item
               name="telefono"
               label="Teléfono"
-              rules={[{ required: true, message: 'Por favor ingrese la ciudad del estudiante' }]}
+              rules={[{ required: true, message: 'Por favor ingrese la ciudad del estudiante' },
+              { max: 10, message: "Máximo 10 dígitos" }
+              ]}
             >
               <Input />
             </Form.Item>

@@ -104,8 +104,11 @@ export default function Page() {
 
   
   //funcion para actualizar y registrar
+  const [loading, setloading] = useState(false)
+
   const onSave = async () => {
     try {
+      setloading(true)
       const token = localStorage.getItem('token');
       form.validateFields().then(async (values) => {
         
@@ -129,12 +132,14 @@ export default function Page() {
         if (!response.ok) {
           const errorData = await response.json();
           message.error(errorData.msg)
+          setloading(false)
           return null;
         }
   
         message.success(editingModule ? 'Materia actualizada exitosamente' : 'Materia registrada exitosamente');
         setIsEditing(false);
         form.resetFields();
+        setloading(false)
   
         fetchModules(token).then((formattedData) => {
           setDataSource(formattedData);
@@ -221,7 +226,9 @@ export default function Page() {
             }}>
               Cancelar
             </Button>,
-            <Button key="save" type="primary" onClick={onSave} className='bg-blue-700'>
+            <Button key="save" type="primary" onClick={onSave} className='bg-blue-700'
+              loading={loading}
+            >
               {editingModule ? 'Actualizar' : 'Guardar'}
             </Button>,
           ]}
@@ -230,7 +237,10 @@ export default function Page() {
             <Form.Item
               name="nombre"
               label="Nombre"
-              rules={[{ required: true, message: 'Por favor ingrese el nombre de la materia' }]}
+              rules={[
+                { required: true, message: 'Ingrese por favor' },
+                { pattern: /^[a-zA-Z]+$/, message: "Ingrese solo letras" }
+              ]}
             >
               <Input />
             </Form.Item>
@@ -244,7 +254,10 @@ export default function Page() {
             <Form.Item
               name="descripcion"
               label="Descripcion"
-              rules={[{ required: true, message: 'Por favor ingrese la descripcion de la materia' }]}
+              rules={[
+                { required: true, message: 'Ingrese por favor' },
+                { pattern: /^[a-zA-Z]+$/, message: "Ingrese solo letras" }
+              ]}
             >
               <Input />
             </Form.Item>
@@ -252,9 +265,9 @@ export default function Page() {
               name="creditos"
               label="Creditos"
               rules={[
-                  { required: true, message: 'Por favor ingrese la fecha de nacimiento de la materia' },
-                  {type:"number", message: "Ingresa solo numeros"}
-                ]}
+                { required: true, message: 'Ingrese por favor' },
+                { pattern: /^[0-9]+$/, message: "Ingrese solo números" }
+              ]}
             >
               <Input />
             </Form.Item>
